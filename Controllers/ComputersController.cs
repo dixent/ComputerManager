@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using ComputerManager.Data;
@@ -25,7 +26,6 @@ namespace ComputerManager.Controllers
 
 
         [HttpGet("/api/computers")]
-
         public async Task<IActionResult> Index()
         {
             var computers = await db.computers.ToListAsync();
@@ -48,11 +48,16 @@ namespace ComputerManager.Controllers
             using (StreamReader stream = new StreamReader(Request.Body, Encoding.UTF8))
             {
                 JObject json = JObject.Parse(await stream.ReadToEndAsync());
-                
                 Computer computer = json["computer"].ToObject<Computer>();
-                db.computers.Add(computer);
-                await db.SaveChangesAsync();
-                return StatusCode(200);
+                if (TryValidateModel(computer))
+                {
+                    db.computers.Add(computer);
+                    await db.SaveChangesAsync();
+                    return StatusCode(200);
+                } else
+                {
+                    return new JsonResult(ModelState);
+                }             
             }
         }
     }

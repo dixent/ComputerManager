@@ -10,7 +10,6 @@ export class Index extends Component {
         fetch("api/computers")
             .then(response => response.json())
             .then((computers) => {
-                console.log(computers);
                 this.setState({
                         computers: computers,
                     });
@@ -30,7 +29,7 @@ export class Index extends Component {
 
     returnComputer(computer) {
         return(
-            <tr>
+            <tr key={`computer_${computer.id}`}>
                 <th scope="row">{computer.id}</th>
                 <td>{computer.firm}</td>
                 <td>{computer.version}</td>
